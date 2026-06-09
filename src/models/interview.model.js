@@ -7,7 +7,7 @@ module.exports = (sequelize) => {
         date: { type: DataTypes.DATE, allowNull: false },
 
         type: {
-            type: DataTypes.ENUM('HR', 'Technical', 'managerial'),
+            type: DataTypes.ENUM('hr', 'technical', 'managerial'),
             allowNull: false,
         },
 
@@ -16,10 +16,27 @@ module.exports = (sequelize) => {
             defaultValue: 'scheduled',
         },
 
-        roundNumber: DataTypes.INTEGER,
-        feedback: DataTypes.TEXT,
+        roundNumber: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                min: 1
+            }
+        },
+
+        feedback: {
+            type: DataTypes.TEXT,
+            defaultValue: ''
+        },
 
         jobId: { type: DataTypes.INTEGER, allowNull: false },
+    }, {
+        indexes: [
+            {
+                unique: true,
+                fields: ['jobId', 'roundNumber'] 
+            }
+        ]
     });
 
     return Interview;

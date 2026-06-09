@@ -884,7 +884,7 @@ router.post('/:id/notes', jobValidation.addNotesToTheJobValidation, validate, jo
 router.get('/:id/notes', jobValidation.getNotesOfTheJobValidation, validate, jobController.getNotesOfTheJob);
 
 
-// POST /jobs/:jobId/interviews
+// POST /jobs/:id/interviews
 // 1. Get jobId + interview data
 // 2. Validate input
 // 3. Check job ownership
@@ -893,7 +893,7 @@ router.get('/:id/notes', jobValidation.getNotesOfTheJobValidation, validate, job
 
 /**
  * @swagger
- * /jobs/{jobId}/interviews:
+ * /jobs/{id}/interviews:
  *   post:
  *     summary: Add interview to a job
  *     description: Create a new interview record for a specific job
@@ -902,7 +902,7 @@ router.get('/:id/notes', jobValidation.getNotesOfTheJobValidation, validate, job
  *       - bearerAuth: []
  *
  *     parameters:
- *       - name: jobId
+ *       - name: id
  *         in: path
  *         description: Job ID
  *         required: true
@@ -935,10 +935,6 @@ router.get('/:id/notes', jobValidation.getNotesOfTheJobValidation, validate, job
  *                 type: string
  *                 enum: [scheduled, cleared, failed]
  *                 example: scheduled
- *
- *               roundNumber:
- *                 type: integer
- *                 example: 1
  *
  *               feedback:
  *                 type: string
@@ -1009,31 +1005,31 @@ router.get('/:id/notes', jobValidation.getNotesOfTheJobValidation, validate, job
  *         description: Job not found
  */
 
-router.post('/:jobId/interviews',(req, res)=>{
-    res.send("Post Job Interviews..");
-});
+router.post('/:id/interviews', jobValidation.addInterviewToTheJobValidation, validate, jobController.addInterviewToTheJob);
 
-// GET /jobs/:jobId/interviews
-// 1. Get jobId
+// GET /jobs/:id/interviews
+// 1. Get id
 // 2. Check ownership
 // 3. Fetch interviews
 // 4. Return list
 
 /**
  * @swagger
- * /jobs/{jobId}/interviews:
+ * /jobs/{id}/interviews:
  *   get:
- *     summary: Get interviews for a job
- *     description: Retrieve all interviews for a specific job
- *     tags: [Jobs]
+ *     summary: Get interviews for a job (grouped by type)
+ *     description: Returns all interviews grouped by interview type (hr, technical, managerial)
+ *     tags:
+ *       - Jobs
+ *
  *     security:
  *       - bearerAuth: []
  *
  *     parameters:
- *       - name: jobId
+ *       - name: id
  *         in: path
- *         description: Job ID
  *         required: true
+ *         description: Job ID
  *         schema:
  *           type: integer
  *           example: 1
@@ -1049,49 +1045,80 @@ router.post('/:jobId/interviews',(req, res)=>{
  *                 success:
  *                   type: boolean
  *                   example: true
+ *
  *                 message:
  *                   type: string
  *                   example: Interviews fetched successfully
+ *
  *                 data:
  *                   type: object
- *                   properties:
- *                     interviews:
- *                       type: array
- *                       items:
- *                         type: object
- *                         properties:
- *                           id:
- *                             type: integer
- *                             example: 10
- *                           date:
- *                             type: string
- *                             format: date-time
- *                             example: 2026-01-25T10:00:00Z
- *                           type:
- *                             type: string
- *                             example: technical
- *                           status:
- *                             type: string
- *                             example: scheduled
- *                           roundNumber:
- *                             type: integer
- *                             example: 1
- *                           feedback:
- *                             type: string
- *                             example: Good problem solving skills
- *                           jobId:
- *                             type: integer
- *                             example: 1
- *                           createdAt:
- *                             type: string
- *                             format: date-time
- *                           updatedAt:
- *                             type: string
- *                             format: date-time
+ *                   description: Interviews grouped by type
+ *                   additionalProperties:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: integer
+ *                           example: 1
+ *
+ *                         date:
+ *                           type: string
+ *                           format: date-time
+ *                           example: 2026-01-25T10:00:00Z
+ *
+ *                         type:
+ *                           type: string
+ *                           example: technical
+ *
+ *                         status:
+ *                           type: string
+ *                           example: scheduled
+ *
+ *                         roundNumber:
+ *                           type: integer
+ *                           example: 1
+ *
+ *                         feedback:
+ *                           type: string
+ *                           example: Good problem solving skills
+ *
+ *                         jobId:
+ *                           type: integer
+ *                           example: 1
+ *
+ *                         createdAt:
+ *                           type: string
+ *                           format: date-time
+ *
+ *                         updatedAt:
+ *                           type: string
+ *                           format: date-time
+ *
+ *                   example:
+ *                     technical:
+ *                       - id: 1
+ *                         date: 2026-01-25T10:00:00Z
+ *                         type: technical
+ *                         status: cleared
+ *                         roundNumber: 1
+ *                         feedback: Strong DSA
+ *                         jobId: 1
+ *
+ *                     hr:
+ *                       - id: 2
+ *                         date: 2026-01-26T11:00:00Z
+ *                         type: hr
+ *                         status: scheduled
+ *                         roundNumber: 1
+ *                         feedback: ""
+ *                         jobId: 1
  *
  *                 error:
  *                   type: object
+ *                   nullable: true
  *                   example: null
+ *
  *       401:
  *         description: Unauthorized
  *
@@ -1101,8 +1128,7 @@ router.post('/:jobId/interviews',(req, res)=>{
  *       404:
  *         description: Job not found
  */
-router.get('/:jobId/interviews',(req, res)=>{
-    res.send("Get Job Interviews..");
-});
+
+router.get('/:id/interviews', jobValidation.getInterviewOfTheJobValidation, validate, jobController.getInterviewOfTheJob);
 
 module.exports = router

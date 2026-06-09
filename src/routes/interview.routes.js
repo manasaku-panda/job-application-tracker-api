@@ -1,5 +1,10 @@
 const router = require('express').Router();
+const interviewValidation = require('../validations/interview.validation');
+const { authMiddleware } = require('../middleware/auth.middleware');
+const validate = require('../validations/validate');
+const interviewController = require('../controller/interview.controller');
 
+router.use(authMiddleware);
 // PUT /interviews/:id
 // 1. Get interviewId
 // 2. Validate input
@@ -13,7 +18,7 @@ const router = require('express').Router();
  * /interviews/{id}:
  *   patch:
  *     summary: Update interview
- *     description: Update an interview record by its ID
+ *     description: Update allowed fields (date, status, feedback) of an interview by ID
  *     tags: [Interviews]
  *     security:
  *       - bearerAuth: []
@@ -33,30 +38,23 @@ const router = require('express').Router();
  *         application/json:
  *           schema:
  *             type: object
+ *             additionalProperties: false
+ *             minProperties: 1
  *             properties:
  *               date:
  *                 type: string
  *                 format: date-time
  *                 example: 2026-01-25T10:00:00Z
  *
- *               type:
- *                 type: string
- *                 enum: [technical, hr, managerial]
- *                 example: technical
- *
  *               status:
  *                 type: string
  *                 enum: [scheduled, cleared, failed]
- *                 example: scheduled
- *
- *               roundNumber:
- *                 type: integer
- *                 example: 1
+ *                 example: cleared
  *
  *               feedback:
  *                 type: string
  *                 nullable: true
- *                 example: Good problem solving skills
+ *                 example: Strong problem solving skills
  *
  *     responses:
  *       200:
@@ -69,44 +67,57 @@ const router = require('express').Router();
  *                 success:
  *                   type: boolean
  *                   example: true
+ *
  *                 message:
  *                   type: string
  *                   example: Interview updated successfully
+ *
  *                 data:
  *                   type: object
  *                   properties:
- *                     interview:
- *                       type: object
- *                       properties:
- *                         id:
- *                           type: integer
- *                           example: 10
- *                         date:
- *                           type: string
- *                           format: date-time
- *                         type:
- *                           type: string
- *                         status:
- *                           type: string
- *                         roundNumber:
- *                           type: integer
- *                         feedback:
- *                           type: string
- *                         jobId:
- *                           type: integer
- *                         createdAt:
- *                           type: string
- *                           format: date-time
- *                         updatedAt:
- *                           type: string
- *                           format: date-time
- * 
+ *                     id:
+ *                       type: integer
+ *                       example: 10
+ *
+ *                     date:
+ *                       type: string
+ *                       format: date-time
+ *
+ *                     type:
+ *                       type: string
+ *                       example: technical
+ *
+ *                     status:
+ *                       type: string
+ *                       example: cleared
+ *
+ *                     roundNumber:
+ *                       type: integer
+ *                       example: 2
+ *
+ *                     feedback:
+ *                       type: string
+ *                       nullable: true
+ *
+ *                     jobId:
+ *                       type: integer
+ *                       example: 1
+ *
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *
  *                 error:
  *                   type: object
+ *                   nullable: true
  *                   example: null
  *
  *       400:
- *         description: Validation error
+ *         description: Validation error (invalid fields or no valid fields provided)
  *
  *       401:
  *         description: Unauthorized
@@ -118,11 +129,9 @@ const router = require('express').Router();
  *         description: Interview not found
  *
  *       409:
- *         description: Conflict (Duplicate or invalid state)
+ *         description: Conflict (Interview is already finalized and cannot be updated)
  */
 
-router.patch('/:id',(req, res)=>{
-    res.send("Interview pathc working...")
-});
+router.patch('/:id',interviewValidation.validateInterviewUpdate, validate, interviewController.updateInterview);
 
 module.exports = router

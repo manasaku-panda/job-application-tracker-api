@@ -4,6 +4,7 @@ const jobRepositories = require('../repositories/job.repositories');
 const companyRepositories = require('../repositories/company.repositories');
 const statusRepositories = require('../repositories/status.repositories');
 const noteRepositories = require('../repositories/notes.repositories');
+const interviewRepositories = require('../repositories/interview.repositories');
 const { sequelize } = require('../models');
 
 const createJob = async (userId, data) => {
@@ -169,7 +170,7 @@ const addNotesToTheJob = async (userId, jobId, data) => {
 
     const noteExist = await noteRepositories.findNoteByJobIdAndType(jobId, data.type);
 
-    if(noteExist){
+    if (noteExist) {
         throw new AppError(MESSAGE.NOTE_ALREADY_EXIST_FOR_THIS_TYPE, STATUS.CONFLICT);
     }
 
@@ -179,11 +180,11 @@ const addNotesToTheJob = async (userId, jobId, data) => {
         jobId: jobId
     });
 
-    return { note : note };
+    return { note: note };
 };
 
 
-const getNotesOfTheJob = async(userId, jobId) =>{
+const getNotesOfTheJob = async (userId, jobId) => {
     const job = await jobRepositories.findJobByid(jobId);
 
     if (!job) {
@@ -197,6 +198,72 @@ const getNotesOfTheJob = async(userId, jobId) =>{
     const notes = await noteRepositories.findNotesByJobId(jobId);
 
     return { notes };
+};
+
+const addInterviewToTheJob = async (userId, jobId, data) => {
+    const job = await jobRepositories.findJobByid(jobId);
+
+    if (!job) {
+        throw new AppError(MESSAGE.JOB_NOT_FOUND, STATUS.NOT_FOUND);
+    }
+
+    if (job.userId != userId) {
+        throw new AppError(MESSAGE.NOT_OWNER_OF_JOB, STATUS.FORBIDDEN);
+    }
+
+    try {
+        const type = data.type.toLowerCase();
+
+        const lastRound = await interviewRepositories.getLastRound(jobId, type);
+
+        const payload = {
+            date: data.date,
+            type: data.type.toLowerCase(),
+            status: data.status || 'scheduled',
+            roundNumber: lastRound ? lastRound.roundNumber + 1 : 1,
+            feedback: data.feedback || '',
+            jobId
+        };
+
+        const interview = await interviewRepositories.createInterview(payload);
+
+        return interview;
+
+    } catch (error) {
+        if (error.name === 'SequelizeUniqueConstraintError') {
+            throw new AppError(MESSAGE.INTERVIEW_ALREADY_EXIST, STATUS.CONFLICT);
+        }
+        throw error;
+    }
+};
+
+const getInterviewsByJobId = async (userId, jobId) => {
+
+    const job = await jobRepositories.findJobByid(jobId);
+
+    if (!job) {
+        throw new AppError(MESSAGE.JOB_NOT_FOUND, STATUS.NOT_FOUND);
+    }
+
+    if (job.userId != userId) {
+        throw new AppError(MESSAGE.NOT_OWNER_OF_JOB, STATUS.FORBIDDEN);
+    }
+
+    const interviews = await interviewRepositories.getInterviewsByJobId(jobId);
+
+    const grouped = {};
+
+    for (const interview of interviews) {
+        const type = interview.type;
+
+        if (!grouped[type]) {
+            grouped[type] = [];
+        }
+
+        grouped[type].push(interview);
+    }
+
+    return grouped;
 }
 
 module.exports = {
@@ -207,5 +274,7 @@ module.exports = {
     deleteJobById,
     updateStatusAndStatusHistory,
     addNotesToTheJob,
-    getNotesOfTheJob
+    getNotesOfTheJob,
+    addInterviewToTheJob,
+    getInterviewsByJobId
 };

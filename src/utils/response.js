@@ -50,6 +50,17 @@ const MESSAGE = {
   NOTE_ADDED_SUCCESSFULLY: "Note created successfully",
   NOTE_ALREADY_EXIST_FOR_THIS_TYPE: "Note already exist for this type you can update the note for this type",
   NOTE_FETCHED_SUCCESSFULLY: "Notes fetched successfully",
+  NOTE_DELETED_SUCCESSFULLY: "Note deleted successfully",
+  NOTE_NOT_FOUND: "Note not found",
+  NOT_OWNER_OF_NOTE: "Forbidden (User does not own this note)",
+  INTERVIEW_CREATED_SUCCESSFULLY: "Interview created successfully",
+  INTERVIEW_ALREADY_EXIST : "Interview already exist for this round number",
+  INTERVIEW_FETCHED_SUCCESSFULLY : "Interviews fetched successfully",
+  INTERVIEW_NOT_FOUND : "Interview not found",
+  INTERVIEW_UPDATED_SUCCESSFULLY: "Interview updated successfully",
+  NOT_OWNER_OF_INTERVIEW: "Forbidden (User does not own this interview)",
+  NO_UPDATE_FIELDS: "No valid fields provided for update",
+  INTERVIEW_ALREADY_FINALIZED: "Conflict (Interview is already finalized and cannot be updated)"
 };
 
 

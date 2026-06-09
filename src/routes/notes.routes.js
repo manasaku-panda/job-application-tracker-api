@@ -1,5 +1,10 @@
 const router = require('express').Router();
+const noteValidation = require('../validations/note.validation');
+const validate = require('../validations/validate');
+const { authMiddleware } = require('../middleware/auth.middleware');
+const noteController = require('../controller/note.controller');
 
+router.use(authMiddleware);
 // DELETE /notes/:id
 // 1. Get noteId
 // 2. Fetch note → get jobId
@@ -52,11 +57,9 @@ const router = require('express').Router();
  *         description: Forbidden (User does not own this note)
  *
  *       404:
- *         description: Note not found
+ *         description: Note not found or Job not found
  */
 
-router.delete('/:id',( req, res )=>{
-    res.send("delete note working..")
-});
+router.delete('/:id', noteValidation.deteteNoteValidation, validate, noteController.deleteNoteById);
 
 module.exports = router;

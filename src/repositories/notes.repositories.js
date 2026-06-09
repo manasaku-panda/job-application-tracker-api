@@ -21,9 +21,19 @@ const findNotesByJobId = async(jobId) =>{
     })
 };
 
+const findNoteById = async(id) =>{
+    return Note.findByPk(id);
+};
+
+const deleteNote = async(note) =>{
+    return await note.destroy();
+};
+
 
 module.exports = {
     createNotes,
     findNoteByJobIdAndType,
-    findNotesByJobId
+    findNotesByJobId,
+    findNoteById,
+    deleteNote
 }

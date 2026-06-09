@@ -105,6 +105,24 @@ const getNotesOfTheJobValidation = [
     param('id').isInt().withMessage('Job ID must be an integer'),
 ]
 
+const addInterviewToTheJobValidation = [
+    param('id').isInt().withMessage('Job ID must be an integer'),
+
+    body('date').isISO8601().withMessage('date must be in Date-time format (e.g., YYYY-MM-DDTHH:mm:ss:ssZ)'),
+
+    body('type').notEmpty().isIn(['hr', 'technical', 'managerial']).withMessage('Enter a valid type (managerial, interview, hr)'),
+
+    body('status').isIn(['scheduled', 'cleared', 'failed']).withMessage('Enter a valid status (scheduled, cleared, failed)'),
+
+    body('roundNumber').optional().isInt().withMessage('roundNumber must be an integer'),
+
+    body('feedback').optional().isString().withMessage('feedback must be a string')
+]
+
+const getInterviewOfTheJobValidation = [
+    param('id').isInt().withMessage('Job ID must be an integer')
+]
+
 module.exports = {
     createJobValidation,
     getJobValidation,
@@ -113,5 +131,7 @@ module.exports = {
     deleteJobByIdValidation,
     updateJobStatusAndStatusHistoryValidation,
     addNotesToTheJobValidation,
-    getNotesOfTheJobValidation
+    getNotesOfTheJobValidation,
+    addInterviewToTheJobValidation,
+    getInterviewOfTheJobValidation
 }

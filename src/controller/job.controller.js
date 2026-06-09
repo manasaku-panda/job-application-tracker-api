@@ -110,6 +110,34 @@ const getNotesOfTheJob = async(req, res, next) =>{
     }
 }
 
+const addInterviewToTheJob = async(req, res, next) =>{
+    try {
+        const userId = req.user.sub;
+
+        const { id } = req.params;
+
+        const data = req.body;
+
+        const result = await jobServices.addInterviewToTheJob(userId, id, data);
+
+        return sendresponse(res, STATUS.CREATED, MESSAGE.INTERVIEW_CREATED_SUCCESSFULLY, result);
+    } catch (error) {
+        next(error)
+    }
+};
+
+const getInterviewOfTheJob = async(req, res, next) =>{
+    try {
+        const userId = req.user.sub;
+        const { id } = req.params;
+
+        const result = await jobServices.getInterviewsByJobId(userId, id);
+        return sendresponse(res, STATUS.SUCCESS, MESSAGE.INTERVIEW_FETCHED_SUCCESSFULLY, result);
+    } catch (error) {
+        next(error)
+    }
+}
+
 module.exports = {
     createJob,
     getJob,
@@ -118,5 +146,7 @@ module.exports = {
     deleteJobById,
     updateStatusAndStatusHistory,
     addNotesToTheJob,
-    getNotesOfTheJob
+    getNotesOfTheJob,
+    addInterviewToTheJob,
+    getInterviewOfTheJob
 }
