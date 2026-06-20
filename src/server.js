@@ -1,8 +1,10 @@
 require('dotenv').config();
 const app = require('./app');
+const cors = require('cors');
 
 const { sequelize } = require('./models');
 
+app.use(cors());
 
 sequelize.authenticate().then(() => {
     console.log('Database connected...');
