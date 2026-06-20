@@ -20,5 +20,5 @@ const server = app.listen(PORT, () => {
 
     const host = process.env.BASE_URL;
 
-    console.log(`Server is running at ${host}:${address.port}`);
+    console.log(`Server is running at ${host}`);
 });
