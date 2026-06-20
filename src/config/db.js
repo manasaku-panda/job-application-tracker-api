@@ -6,17 +6,20 @@ const sequelize = new Sequelize(
     process.env.DB_PASSWORD,
     {
         host: process.env.DB_HOST,
-        port: process.env.DB_PORT, // ADD THIS
+        port: process.env.DB_PORT,
         dialect: 'mysql',
 
-        dialectOptions: {
-            ssl: {
-                require: true,
-                rejectUnauthorized: false
+        dialectOptions:
+            process.env.NODE_ENV === 'production'
+            ? {
+                ssl: {
+                    require: true,
+                    rejectUnauthorized: false
+                }
             }
-        },
+            : {},
 
-        logging: false
+        logging: process.env.NODE_ENV !== 'production'? console.log : false
     }
 );
 
