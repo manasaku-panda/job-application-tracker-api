@@ -60,7 +60,9 @@ const MESSAGE = {
   INTERVIEW_UPDATED_SUCCESSFULLY: "Interview updated successfully",
   NOT_OWNER_OF_INTERVIEW: "Forbidden (User does not own this interview)",
   NO_UPDATE_FIELDS: "No valid fields provided for update",
-  INTERVIEW_ALREADY_FINALIZED: "Conflict (Interview is already finalized and cannot be updated)"
+  INTERVIEW_ALREADY_FINALIZED: "Conflict (Interview is already finalized and cannot be updated)",
+  DASHBOARD_SUMMARY_RETRIVE_SUCCESSFULLY: "Dashboard summary retrieved successfully",
+  ANALYSIS_DATA_RETRIVE_SUCCESSFULLY: "Analytics data retrieved successfully"
 };
 
 

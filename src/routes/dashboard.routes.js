@@ -1,5 +1,8 @@
 const router = require('express').Router();
+const { authMiddleware } = require('../middleware/auth.middleware');
+const dashboardController = require('../controller/dashboard.controller');
 
+router.use(authMiddleware);
 // GET /dashboard
 // 1. Get userId
 // 2. Query:
@@ -12,7 +15,7 @@ const router = require('express').Router();
  * /dashboard:
  *   get:
  *     summary: Get dashboard summary
- *     description: Retrieve a summary of the user's job applications
+ *     description: Retrieve an overview of jobs, interviews, and recent activity for the logged-in user
  *     tags: [Dashboard]
  *     security:
  *       - bearerAuth: []
@@ -28,32 +31,77 @@ const router = require('express').Router();
  *                 success:
  *                   type: boolean
  *                   example: true
+ *
+ *                 message:
+ *                   type: string
+ *                   example: Dashboard summary fetched successfully
+ *
  *                 data:
  *                   type: object
  *                   properties:
  *                     totalJobs:
  *                       type: integer
- *                       example: 5
- *                     byStatus:
+ *                       example: 12
+ *
+ *                     totalInterviews:
+ *                       type: integer
+ *                       example: 34
+ *
+ *                     statusCounts:
  *                       type: object
- *                       additionalProperties:
- *                         type: integer
- *                       example:
- *                         applied: 2
- *                         interview: 1
- *                         rejected: 2
- * 
+ *                       properties:
+ *                         scheduled:
+ *                           type: integer
+ *                           example: 10
+ *                         cleared:
+ *                           type: integer
+ *                           example: 15
+ *                         failed:
+ *                           type: integer
+ *                           example: 9
+ *
+ *                     recentInterviews:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                             example: 1
+ *
+ *                           company:
+ *                             type: string
+ *                             example: Google
+ *
+ *                           role:
+ *                             type: string
+ *                             example: SDE
+ *
+ *                           type:
+ *                             type: string
+ *                             example: technical
+ *
+ *                           status:
+ *                             type: string
+ *                             example: scheduled
+ *
+ *                           date:
+ *                             type: string
+ *                             format: date-time
+ *                             example: 2026-01-25T10:00:00Z
+ *
  *                 error:
  *                   type: object
+ *                   nullable: true
  *                   example: null
  *
  *       401:
  *         description: Unauthorized
+ *
+ *       404:
+ *         description: User not found
  */
-
-router.get('/',( req, res )=>{
-    res.send("dashboard working..")
-});
+router.get('/', dashboardController.getDashboradSummary);
 
 // GET /dashboard/analytics
 // 1. Get userId
@@ -67,7 +115,7 @@ router.get('/',( req, res )=>{
  * /dashboard/analytics:
  *   get:
  *     summary: Get analytics data
- *     description: Retrieve analytics data for the user's job applications
+ *     description: Retrieve interview analytics including monthly trends, status distribution, and interview types
  *     tags: [Dashboard]
  *     security:
  *       - bearerAuth: []
@@ -83,23 +131,18 @@ router.get('/',( req, res )=>{
  *                 success:
  *                   type: boolean
  *                   example: true
+ *
+ *                 message:
+ *                   type: string
+ *                   example: Analytics data fetched successfully
+ *
  *                 data:
  *                   type: object
  *                   properties:
- *                     jobsPerCompany:
- *                       type: array
- *                       items:
- *                         type: object
- *                         properties:
- *                           company:
- *                             type: string
- *                             example: Company A
- *                           count:
- *                             type: integer
- *                             example: 2
  *
- *                     monthlyApplications:
+ *                     monthlyTrends:
  *                       type: array
+ *                       description: Number of interviews per month
  *                       items:
  *                         type: object
  *                         properties:
@@ -108,18 +151,48 @@ router.get('/',( req, res )=>{
  *                             example: 2026-01
  *                           count:
  *                             type: integer
- *                             example: 2
- * 
+ *                             example: 5
+ *
+ *                     statusCounts:
+ *                       type: object
+ *                       description: Distribution of interview statuses
+ *                       properties:
+ *                         scheduled:
+ *                           type: integer
+ *                           example: 3
+ *                         cleared:
+ *                           type: integer
+ *                           example: 7
+ *                         failed:
+ *                           type: integer
+ *                           example: 2
+ *
+ *                     typeCounts:
+ *                       type: object
+ *                       description: Distribution of interview types
+ *                       properties:
+ *                         hr:
+ *                           type: integer
+ *                           example: 4
+ *                         technical:
+ *                           type: integer
+ *                           example: 6
+ *                         managerial:
+ *                           type: integer
+ *                           example: 2
+ *
  *                 error:
  *                   type: object
+ *                   nullable: true
  *                   example: null
  *
  *       401:
  *         description: Unauthorized
+ *
+ *       404:
+ *         description: User not found
  */
 
-router.get('/analytics',( req, res )=>{
-    res.send("analytics working..")
-});
+router.get('/analytics', dashboardController.getDashboardanalytics);
 
 module.exports = router

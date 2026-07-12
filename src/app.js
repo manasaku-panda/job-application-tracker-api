@@ -3,8 +3,11 @@ const routes = require('./routes');
 const errorhandler = require('./middleware/error.middleware');
 const limiter = require('./middleware/ratelimit.middleware');
 const { swaggerUi, swaggerSpec } = require('./swagger');
+const cors = require('cors');
 
 const app = express();
+
+app.use(cors());
 
 app.use(limiter);
 app.use(express.json());

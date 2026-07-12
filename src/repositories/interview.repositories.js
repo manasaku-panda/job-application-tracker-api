@@ -1,4 +1,5 @@
-const { Interview } = require('../models');
+const { Sequelize } = require('sequelize');
+const { Interview, Job, sequelize } = require('../models');
 
 const createInterview = async(data) =>{
     return await Interview.create(data);
@@ -56,6 +57,84 @@ const updateInterview = async(interview, data) =>{
     return interview.update(data);
 }
 
+const countInterviewByUser = async(userId) =>{
+    return Interview.count({
+        include:[
+            {
+                model : Job,
+                where : {userId},
+                attributes : []
+            }
+        ]
+    })
+};
+
+const getStatusCount = async (userId) => {
+    return await Interview.findAll({
+        attributes: [
+            'status',
+            [Sequelize.fn('COUNT', Sequelize.col('interviews.id')), 'count']
+        ],
+        include: [
+            {
+                model: Job,
+                where: { userId },
+                attributes: []
+            }
+        ],
+        group: ['interviews.status']
+    });
+};
+
+const getRecentInterviews = async(userId, limit = 5) =>{
+    return Interview.findAll({
+        include: [
+            {
+                model: Job,
+                where: {userId},
+                attributes: []
+            }
+        ],
+        order :[ ['id', 'DESC']],
+        limit
+    })
+};
+
+const getMonthlyTrends = async(userId) =>{
+    return Interview.findAll({
+        attributes: [
+            [Sequelize.fn('DATE_FORMAT', Sequelize.col('interviews.date'), '%Y-%m'),'month'],
+            [Sequelize.fn('COUNT',Sequelize.col('interviews.id')),'count']
+        ],
+        include: [
+            {
+                model: Job,
+                where: {userId},
+                attributes: []
+            }
+        ],
+        group: ['month'],
+        order: [[Sequelize.literal('month'),'ASC']]
+    })
+};
+
+const getTypeCount = async (userId) => {
+    return await Interview.findAll({
+        attributes: [
+            'type',
+            [Sequelize.fn('COUNT', Sequelize.col('interviews.id')), 'count']
+        ],
+        include: [
+            {
+                model: Job,
+                where: { userId },
+                attributes: []
+            }
+        ],
+        group: ['interviews.type']
+    });
+};
+
 module.exports = {
     createInterview,
     isUniqueInterview,
@@ -63,5 +142,10 @@ module.exports = {
     getLastRound,
     getInterviewsByJobId,
     getInterviewById,
-    updateInterview
+    updateInterview,
+    countInterviewByUser,
+    getStatusCount,
+    getRecentInterviews,
+    getMonthlyTrends,
+    getTypeCount
 }

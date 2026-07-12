@@ -94,6 +94,14 @@ const getJobById = async(userId, jobId) =>{
     })
 };
 
+const countJobByUser = async (userId) => {
+    return await Job.count({
+        where: {
+            userId
+        }
+    });
+};
+
 const updateJobById = async(job, data, transaction) =>{
     // const job = await Job.findOne({
     //     where:{
@@ -149,5 +157,6 @@ module.exports = {
     getJobById,
     updateJobById,
     deleteJobById,
-    findJobByid
+    findJobByid,
+    countJobByUser
 }
