@@ -58,6 +58,13 @@ const getJob = async (userId, { page, limit, status, companyId, priority, search
 
     const { count, rows } = await Job.findAndCountAll({
         where,
+        include:[
+            {
+                model: Company,
+                attributes: ['name'],
+                required: true
+            }
+        ],
         limit: pageSize,
         offset,
         order: [[orderBy, orderDirection]]

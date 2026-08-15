@@ -1,5 +1,5 @@
-const { Sequelize } = require('sequelize');
-const { Interview, Job, sequelize } = require('../models');
+const { Sequelize, where } = require('sequelize');
+const { Interview, Job, sequelize, Company } = require('../models');
 
 const createInterview = async(data) =>{
     return await Interview.create(data);
@@ -92,7 +92,15 @@ const getRecentInterviews = async(userId, limit = 5) =>{
             {
                 model: Job,
                 where: {userId},
-                attributes: []
+                attributes: ['companyId'],
+                required: true,
+                include: [
+                    {
+                        model: Company,
+                        attributes: ['name'],
+                        required: true
+                    }
+                ]
             }
         ],
         order :[ ['id', 'DESC']],
