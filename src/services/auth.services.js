@@ -3,6 +3,8 @@ const { hashpassword, verifypassword } = require('../utils/passwordmanager');
 const userRepo = require('../repositories/user.repositories');
 const { generateToken } = require('../utils/token');
 const AppError = require('../utils/apperror');
+const cachekeys = require('../utils/cacheKeys');
+const cacheService = require('../services/cache.services');
 
 const register = async (data) => {
     const { name, email, password, role = "user" } = data;
@@ -73,6 +75,14 @@ const profile = async (data) => {
         throw new AppError(MESSAGE.INVALID_EXPIRED_TOKEN, STATUS.UNAUTHORIZED);
     };
 
+    const cacheKey = cachekeys.profileCacheKey(role,sub);
+
+    const cacheUser = await cacheService.getCache(cacheKey);
+
+    if(cacheUser){
+        return JSON.parse(cacheUser);
+    }
+
     const raw_user = await userRepo.findByIdAndRole(sub, role);
 
     if (!raw_user) {
@@ -87,6 +97,8 @@ const profile = async (data) => {
         createdAt: raw_user.createdAt,
         updatedAt: raw_user.updatedAt
     };
+
+    await cacheService.setCache(cacheKey, JSON.stringify(user), 500);
 
     return user;
     

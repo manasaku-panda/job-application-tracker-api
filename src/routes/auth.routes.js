@@ -122,7 +122,7 @@ router.post('/register', registervalidation, validate, authcontroller.register);
  *                 type: string
  *                 example: StrongPass@1
  *     responses:
- *       201:
+ *       200:
  *         description: Login successfully
  *         content:
  *           application/json:
