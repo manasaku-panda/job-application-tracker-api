@@ -24,7 +24,13 @@ const login = async(req, res,next)=>{
         
         const result = await authservices.login(userData);
 
-        return sendresponse(res, STATUS.SUCCESS, MESSAGE.LOGIN_SUCCESS, result);
+        res.cookie("refreshToken", result.refreshtoken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 24 * 60 * 60 * 1000
+        });
+
+        return sendresponse(res, STATUS.SUCCESS, MESSAGE.LOGIN_SUCCESS, {accessToken: result.token});
     } catch (error) {
         next(error)
     }
@@ -42,8 +48,43 @@ const profile = async(req, res, next)=>{
     }
 }
 
+
+const refreshverifiedsendtoken = async(req, res, next) =>{
+    try {
+        const userData = req.user;
+
+        const result = await authservices.refreshverifiedsendtoken(userData); 
+
+        return sendresponse(res, STATUS.SUCCESS, MESSAGE.ACCESS_TOKEN_REFRESHED, {accessToken: result.token});
+    } catch (error) {
+        next(error)
+    }
+}
+
+const logout = async (req, res, next) => {
+    try {
+        res.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production'
+        });
+
+        return sendresponse(
+            res,
+            STATUS.SUCCESS,
+            MESSAGE.LOGOUT_SUCCESS,
+            null
+        );
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+
 module.exports ={
     register,
     login,
-    profile
+    profile,
+    refreshverifiedsendtoken,
+    logout
 }

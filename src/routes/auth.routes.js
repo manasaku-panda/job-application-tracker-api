@@ -2,7 +2,7 @@ const router = require('express').Router();
 const authcontroller = require('../controller/auth.controller');
 const { registervalidation, loginvalidation } = require('../validations/auth.validation');
 const validate = require('../validations/validate');
-const { authMiddleware } = require('../middleware/auth.middleware');
+const { authMiddleware, verifyrefresh } = require('../middleware/auth.middleware');
 
 /**
  * @swagger
@@ -215,5 +215,81 @@ router.post('/login', loginvalidation, validate, authcontroller.login);
  *         description: User not found
  */
 router.get('/profile', authMiddleware, authcontroller.profile);
+
+/**
+ * @swagger
+ * /auth/refresh:
+ *   get:
+ *     summary: Refresh access token
+ *     description: Generates a new access token using the refresh token stored in an HttpOnly cookie.
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Access token refreshed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Token refreshed successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     accessToken:
+ *                       type: string
+ *                       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *
+ *       401:
+ *         description: Refresh token missing, invalid, or expired
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Invalid or expired refresh token
+ */
+router.get('/refresh', verifyrefresh, authcontroller.refreshverifiedsendtoken);
+
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Logout user
+ *     description: Clears the refresh token cookie and logs the user out.
+ *     tags:
+ *       - Authentication
+ *     responses:
+ *       200:
+ *         description: Logout successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Logout successful
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *                   example: null
+ *       401:
+ *         description: Unauthorized
+ */
+router.post('/logout', authcontroller.logout);
+
 
 module.exports = router;

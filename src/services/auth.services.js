@@ -1,7 +1,7 @@
 const { STATUS, MESSAGE } = require('../utils/response');
 const { hashpassword, verifypassword } = require('../utils/passwordmanager');
 const userRepo = require('../repositories/user.repositories');
-const { generateToken } = require('../utils/token');
+const { generateToken, generateRefreshToken } = require('../utils/token');
 const AppError = require('../utils/apperror');
 const cachekeys = require('../utils/cacheKeys');
 const cacheService = require('../services/cache.services');
@@ -63,8 +63,14 @@ const login = async (data) => {
         role: user.role
     });
 
+    const refreshtoken = generateRefreshToken({
+        sub: user.id,
+        role: user.role
+    })
+
     return {
-        token
+        token,
+        refreshtoken
     };
 };
 
@@ -104,8 +110,23 @@ const profile = async (data) => {
     
 };
 
+const refreshverifiedsendtoken = async (data) => {
+
+    const { sub, role } = data;
+
+    const token = generateToken({
+        sub,
+        role
+    });
+
+    return {
+        token
+    };
+};
+
 module.exports = {
     register,
     login,
-    profile
+    profile,
+    refreshverifiedsendtoken
 }

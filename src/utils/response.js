@@ -62,7 +62,8 @@ const MESSAGE = {
   NO_UPDATE_FIELDS: "No valid fields provided for update",
   INTERVIEW_ALREADY_FINALIZED: "Conflict (Interview is already finalized and cannot be updated)",
   DASHBOARD_SUMMARY_RETRIVE_SUCCESSFULLY: "Dashboard summary retrieved successfully",
-  ANALYSIS_DATA_RETRIVE_SUCCESSFULLY: "Analytics data retrieved successfully"
+  ANALYSIS_DATA_RETRIVE_SUCCESSFULLY: "Analytics data retrieved successfully",
+  ACCESS_TOKEN_REFRESHED:"Access token refreshed successfully" 
 };
 
 
