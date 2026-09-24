@@ -30,6 +30,13 @@ async function startServer() {
         await sequelize.authenticate();
         console.log('Database connected...');
         await sequelize.sync();
+
+        const server = app.listen(PORT, () => {
+            const host = process.env.BASE_URL;
+            console.log(`Server is running at ${host}`);
+        });
+
+        
         try {
             await redisClient.connect();
             // console.log('Redis connected...');
@@ -44,10 +51,6 @@ async function startServer() {
             );
         }
 
-        const server = app.listen(PORT, () => {
-            const host = process.env.BASE_URL;
-            console.log(`Server is running at ${host}`);
-        });
     } catch (error) {
         console.error(
             'Server startup failed:',
